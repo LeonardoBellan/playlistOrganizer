@@ -1,0 +1,16 @@
+{
+    "name": "spotify",
+    "version": "1.0.0",
+    "description": "Riorganizzatore di playlist",
+    "main": "src/index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Bellan Leonardo",
+    "license": "ISC",
+    "dependencies": {
+        "dotenv": "^16.4.7",
+        "node-localstorage": "^3.0.5",
+        "request": "^2.88.2"
+    }
+}
