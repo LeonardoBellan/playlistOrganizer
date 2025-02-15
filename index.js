@@ -3,7 +3,7 @@ const request = require("request");
 const { get_access_token, refresh_token } = require("./spotifyAuth.js");
 
 //Playlists IDs
-const PLAYLIST_IDs = process.env.PLAYLIST_IDs.split(", ");
+const PLAYLIST_IDs = process.argv.slice(2);
 
 //Organize all playlists
 (async () => {
