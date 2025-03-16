@@ -21,7 +21,6 @@ async function get_access_token() {
 
 async function refresh_token() {
     const refresh_token = localStorage.getItem("refresh_token");
-    console.log("Refresh token: ", refresh_token);
 
     const response = await fetch("https://accounts.spotify.com/api/token", {
         method: "POST",

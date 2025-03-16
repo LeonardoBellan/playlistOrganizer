@@ -5,14 +5,17 @@ const { get_access_token, refresh_token } = require("./spotifyAuth.js");
 //Playlists IDs
 const PLAYLIST_IDs = process.argv.slice(2);
 
-//Organize all playlists
 (async () => {
     try {
         console.log("Token: \x1b[33m" + (await get_access_token()) + "\x1b[0m");
+
+        //Organize all playlists
         for (const playlist_id of PLAYLIST_IDs) {
             console.log("\nOrganizing:\x1b[34m " + playlist_id + "\x1b[0m");
             //Move the tracks in the correct position
             let tracks = await get_playlist_tracks(playlist_id);
+
+            //Search for unsorted items
             for (let i = 0; i + 1 < tracks.length; i++) {
                 if (compareTracks(tracks[i], tracks[i + 1]) == 1) {
                     // i+1 unsorted item
