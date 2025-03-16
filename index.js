@@ -13,30 +13,7 @@ const PLAYLIST_IDs = process.argv.slice(2);
         for (const playlist_id of PLAYLIST_IDs) {
             console.log("\nOrganizing:\x1b[34m " + playlist_id + "\x1b[0m");
             //Move the tracks in the correct position
-            let tracks = await get_playlist_tracks(playlist_id);
-
-            //Search for unsorted items
-            for (let i = 0; i + 1 < tracks.length; i++) {
-                if (compareTracks(tracks[i], tracks[i + 1]) == 1) {
-                    // i+1 unsorted item
-                    console.log(
-                        "\t\x1b[31m Moving " +
-                            tracks[i + 1].track.name +
-                            "\x1b[0m"
-                    );
-
-                    //Search for correct position
-                    for (let j = 0; j <= i; j++) {
-                        if (compareTracks(tracks[j], tracks[i + 1]) == 1) {
-                            await move_track(playlist_id, i + 1, 1, j);
-                            console.log("\tTrack moved successfully");
-                            break;
-                        }
-                    }
-
-                    tracks = await get_playlist_tracks(playlist_id);
-                }
-            }
+            sortTracks(playlist_id);
         }
         console.log("\n\x1b[32m Playlists organized! \x1b[0m");
     } catch (error) {
@@ -58,6 +35,28 @@ function compareTracks(track1, track2) {
             return track1.track.track_number >= track2.track.track_number;
     }
     return compare;
+}
+
+async function sortTracks(playlist_id) {
+    let tracks = await get_playlist_tracks(playlist_id);
+    //Search for unsorted items
+    for (let i = 0; i + 1 < tracks.length; i++) {
+        if (compareTracks(tracks[i], tracks[i + 1]) == 1) {
+            // i+1 unsorted item
+            console.log(
+                "\t\x1b[31m Moving " + tracks[i + 1].track.name + "\x1b[0m"
+            );
+            //Search for correct position
+            for (let j = 0; j <= i; j++) {
+                if (compareTracks(tracks[j], tracks[i + 1]) == 1) {
+                    await move_track(playlist_id, i + 1, 1, j);
+                    tracks.splice(j, 0, tracks.splice(i + 1, 1)[0]);
+                    console.log("\tTrack moved successfully");
+                    break;
+                }
+            }
+        }
+    }
 }
 
 //Spotify API calls
