@@ -27,31 +27,28 @@ function compareTracks(track1, track2) {
     let compare = track1.track.artists[0].name.localeCompare(
         track2.track.artists[0].name
     );
-    if (compare == 0) {
-        compare = track1.track.album.name.localeCompare(
-            track2.track.album.name
-        );
-        if (compare == 0)
-            return track1.track.track_number >= track2.track.track_number;
-    }
-    return compare;
+    if (compare !== 0) return compare;
+    compare = track1.track.album.name.localeCompare(track2.track.album.name);
+    if (compare !== 0) return compare;
+    if (track1.track.track_number == track2.track.track_number) return 0;
+    return track1.track.track_number < track2.track.track_number ? -1 : 1;
 }
-
 async function sortTracks(playlist_id) {
     let tracks = await get_playlist_tracks(playlist_id);
     //Search for unsorted items
     for (let i = 0; i + 1 < tracks.length; i++) {
-        if (compareTracks(tracks[i], tracks[i + 1]) == 1) {
+        let compare = compareTracks(tracks[i], tracks[i + 1]);
+        if (compare === 1 || compare === 0) {
             // i+1 unsorted item
             console.log(
-                "\t\x1b[31m Moving " + tracks[i + 1].track.name + "\x1b[0m"
+                "\t\x1b[31m Controlling " + tracks[i + 1].track.name + "\x1b[0m"
             );
             //Search for correct position
             for (let j = 0; j <= i; j++) {
                 if (compareTracks(tracks[j], tracks[i + 1]) == 1) {
                     await move_track(playlist_id, i + 1, 1, j);
                     tracks.splice(j, 0, tracks.splice(i + 1, 1)[0]);
-                    console.log("\tTrack moved successfully");
+                        flag = true;
                     break;
                 }
             }
@@ -109,6 +106,7 @@ async function move_track(
 
     if (response.ok) {
         const data = await response.json();
+        console.log("\tTrack moved successfully");
         return data.snapshot_id;
     } else {
         throw new Error("Failed to move track: " + response.statusText);
