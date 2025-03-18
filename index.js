@@ -11,9 +11,8 @@ const PLAYLIST_IDs = process.argv.slice(2);
 
         //Organize all playlists
         for (const playlist_id of PLAYLIST_IDs) {
-            console.log("\nOrganizing:\x1b[34m " + playlist_id + "\x1b[0m");
             //Move the tracks in the correct position
-            sortTracks(playlist_id);
+            await sortTracks(playlist_id);
         }
         console.log("\n\x1b[32m Playlists organized! \x1b[0m");
     } catch (error) {
@@ -35,10 +34,17 @@ function compareTracks(track1, track2) {
 }
 async function sortTracks(playlist_id) {
     let tracks = await get_playlist_tracks(playlist_id);
+    console.log(
+        "\nOrganizing:\x1b[34m " +
+            playlist_id +
+            ": " +
+            tracks.length +
+            " tracks \x1b[0m"
+    );
     //Search for unsorted items
     for (let i = 0; i + 1 < tracks.length; i++) {
         let compare = compareTracks(tracks[i], tracks[i + 1]);
-        if (compare === 1 || compare === 0) {
+        if (compare === 1) {
             // i+1 unsorted item
             console.log(
                 "\t\x1b[31m Controlling " + tracks[i + 1].track.name + "\x1b[0m"
@@ -48,7 +54,6 @@ async function sortTracks(playlist_id) {
                 if (compareTracks(tracks[j], tracks[i + 1]) == 1) {
                     await move_track(playlist_id, i + 1, 1, j);
                     tracks.splice(j, 0, tracks.splice(i + 1, 1)[0]);
-                        flag = true;
                     break;
                 }
             }
@@ -59,24 +64,30 @@ async function sortTracks(playlist_id) {
 //Spotify API calls
 async function get_playlist_tracks(playlist_id) {
     const access_token = await get_access_token();
+    let tracks = [];
+    let offset = 0;
+    while (offset !== null) {
+        const response = await fetch(
+            `https://api.spotify.com/v1/playlists/${playlist_id}/tracks?offset=${offset}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
+                json: true,
+            }
+        );
 
-    const response = await fetch(
-        `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`,
-        {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-            },
-            json: true,
+        if (response.ok) {
+            const data = await response.json();
+            tracks = tracks.concat(data.items);
+            if (data.next === null) offset = null;
+            else offset = data.offset + data.limit;
+        } else {
+            throw new Error("Failed to move track: " + response.statusText);
         }
-    );
-
-    if (response.ok) {
-        const data = await response.json();
-        return data.items;
-    } else {
-        throw new Error("Failed to move track: " + response.statusText);
     }
+    return tracks;
 }
 
 async function move_track(
