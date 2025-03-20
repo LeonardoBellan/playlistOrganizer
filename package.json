@@ -8,9 +8,11 @@
     },
     "author": "Bellan Leonardo",
     "license": "ISC",
+    "type": "module",
     "dependencies": {
         "dotenv": "^16.4.7",
         "node-localstorage": "^3.0.5",
+        "ora": "^8.2.0",
         "request": "^2.88.2"
     }
 }

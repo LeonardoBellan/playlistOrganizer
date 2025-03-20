@@ -1,5 +1,6 @@
-const LocalStorage = require("node-localstorage").LocalStorage;
-require("dotenv").config();
+import { LocalStorage } from "node-localstorage";
+import dotenv from "dotenv";
+dotenv.config();
 
 // Local storage setup
 const localStorage = new LocalStorage("./localStorage");
@@ -8,7 +9,7 @@ const localStorage = new LocalStorage("./localStorage");
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
-async function get_access_token() {
+export async function get_access_token() {
     if (
         localStorage.getItem("access_token") === null ||
         Number(localStorage.getItem("expiration")) < Date.now()
@@ -19,7 +20,7 @@ async function get_access_token() {
     return localStorage.getItem("access_token");
 }
 
-async function refresh_token() {
+export async function refresh_token() {
     const refresh_token = localStorage.getItem("refresh_token");
 
     const response = await fetch("https://accounts.spotify.com/api/token", {
@@ -45,7 +46,3 @@ async function refresh_token() {
         throw new Error("Failed to refresh token: " + response.statusText);
     }
 }
-
-module.exports = {
-    get_access_token,
-};

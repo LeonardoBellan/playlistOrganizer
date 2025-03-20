@@ -1,20 +1,22 @@
-require("dotenv").config();
-const request = require("request");
-const { get_access_token, refresh_token } = require("./spotifyAuth.js");
+import request from "request";
+import { get_access_token, refresh_token } from "./spotifyAuth.js";
+import ora from "ora";
 
 //Playlists IDs
 const PLAYLIST_IDs = process.argv.slice(2);
 
 (async () => {
     try {
-        console.log("Token: \x1b[33m" + (await get_access_token()) + "\x1b[0m");
+        console.log(
+            "Token: \x1b[33m" + (await get_access_token()) + "\x1b[0m\n"
+        );
 
         //Organize all playlists
         for (const playlist_id of PLAYLIST_IDs) {
             //Move the tracks in the correct position
             await sortTracks(playlist_id);
         }
-        console.log("\n\x1b[32m Playlists organized! \x1b[0m");
+        console.log("\x1b[32m Playlists organized! \x1b[0m");
     } catch (error) {
         console.error("Error organizing playlists: ", error);
     }
@@ -34,21 +36,19 @@ function compareTracks(track1, track2) {
 }
 async function sortTracks(playlist_id) {
     let tracks = await get_playlist_tracks(playlist_id);
-    console.log(
-        "\nOrganizing:\x1b[34m " +
+
+    const loading = ora(
+        "Organizing:\x1b[34m " +
             playlist_id +
-            ": " +
+            "\x1b[0m: " +
             tracks.length +
-            " tracks \x1b[0m"
-    );
+            " tracks "
+    ).start();
     //Search for unsorted items
     for (let i = 0; i + 1 < tracks.length; i++) {
         let compare = compareTracks(tracks[i], tracks[i + 1]);
         if (compare === 1) {
             // i+1 unsorted item
-            console.log(
-                "\t\x1b[31m Controlling " + tracks[i + 1].track.name + "\x1b[0m"
-            );
             //Search for correct position
             for (let j = 0; j <= i; j++) {
                 if (compareTracks(tracks[j], tracks[i + 1]) == 1) {
@@ -59,6 +59,15 @@ async function sortTracks(playlist_id) {
             }
         }
     }
+    loading.stopAndPersist({
+        symbol: "\x1b[32m✔\x1b[0m",
+        text:
+            "Organized:\x1b[34m " +
+            playlist_id +
+            "\x1b[0m: " +
+            tracks.length +
+            " tracks ",
+    });
 }
 
 //Spotify API calls
@@ -117,7 +126,6 @@ async function move_track(
 
     if (response.ok) {
         const data = await response.json();
-        console.log("\tTrack moved successfully");
         return data.snapshot_id;
     } else {
         throw new Error("Failed to move track: " + response.statusText);
