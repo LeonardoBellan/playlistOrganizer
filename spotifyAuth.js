@@ -14,7 +14,7 @@ export async function get_access_token() {
         localStorage.getItem("access_token") === null ||
         Number(localStorage.getItem("expiration")) < Date.now()
     ) {
-        console.log("Access token not found or expired");
+        console.log("\x1b[31mAccess token not found or expired\x1b[0m");
         localStorage.setItem("access_token", await refresh_token());
     }
     return localStorage.getItem("access_token");

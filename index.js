@@ -1,6 +1,8 @@
 import request from "request";
+import dotenv from "dotenv";
 import { get_access_token, refresh_token } from "./spotifyAuth.js";
 import ora from "ora";
+dotenv.config();
 
 //Playlists IDs
 const PLAYLIST_IDs = process.argv.slice(2);
@@ -10,6 +12,33 @@ const PLAYLIST_IDs = process.argv.slice(2);
         console.log(
             "Token: \x1b[33m" + (await get_access_token()) + "\x1b[0m\n"
         );
+
+        //Test playlist
+        if (PLAYLIST_IDs.length === 0) {
+            console.log("\x1b[33mTest playlist\x1b[0m");
+            PLAYLIST_IDs.push(process.env.TEST_PLAYLIST_ID);
+
+            //Loading animation
+            const loading = ora("Shuffling test playlist...").start();
+
+            //Shuffle the playlist randomly
+            let playlistLength = (await get_playlist_tracks(PLAYLIST_IDs[0]))
+                .length;
+            for (let i = 0; i < 2 * playlistLength; i++) {
+                await move_track(
+                    PLAYLIST_IDs[0],
+                    Math.floor(Math.random() * playlistLength),
+                    1,
+                    Math.floor(Math.random() * playlistLength),
+                    null
+                );
+            }
+
+            loading.stopAndPersist({
+                symbol: "\x1b[32m✔\x1b[0m",
+                text: "Shuffled",
+            });
+        }
 
         //Organize all playlists
         for (const playlist_id of PLAYLIST_IDs) {
@@ -37,6 +66,7 @@ function compareTracks(track1, track2) {
 async function sortTracks(playlist_id) {
     let tracks = await get_playlist_tracks(playlist_id);
 
+    //Loading animation
     const loading = ora(
         "Organizing:\x1b[34m " +
             playlist_id +
@@ -44,6 +74,7 @@ async function sortTracks(playlist_id) {
             tracks.length +
             " tracks "
     ).start();
+
     //Search for unsorted items
     for (let i = 0; i + 1 < tracks.length; i++) {
         let compare = compareTracks(tracks[i], tracks[i + 1]);
