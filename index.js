@@ -54,11 +54,7 @@ async function sortTracks(playlist_id) {
 
     //Loading animation
     const loading = ora(
-        "Organizing:\x1b[34m " +
-            playlist_name +
-            "\x1b[0m: " +
-            tracks.length +
-            " tracks "
+        `\x1b[34mOrganizing ${playlist_name} :\x1b[0m ${tracks.length} tracks`
     ).start();
 
     //Search for unsorted items
@@ -78,12 +74,7 @@ async function sortTracks(playlist_id) {
     }
     loading.stopAndPersist({
         symbol: "\x1b[32m✔\x1b[0m",
-        text:
-            "Organized:\x1b[34m " +
-            playlist_name +
-            "\x1b[0m: " +
-            tracks.length +
-            " tracks ",
+        text: `\x1b[34mOrganized ${playlist_name}:\x1b[0m ${tracks.length} tracks`,
     });
 }
 async function shufflePlaylist(playlist_id) {
