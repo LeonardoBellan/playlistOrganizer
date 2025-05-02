@@ -15,14 +15,15 @@ export async function get_access_token() {
         Number(localStorage.getItem("expiration")) < Date.now()
     ) {
         console.log("\x1b[31mAccess token not found or expired\x1b[0m");
-        localStorage.setItem("access_token", await refresh_token());
+        localStorage.setItem("access_token", await refresh_access_token());
     }
     return localStorage.getItem("access_token");
 }
-
-export async function refresh_token() {
+async function refresh_access_token() {
     const refresh_token = localStorage.getItem("refresh_token");
-
+    if (refresh_token === null) {
+        throw new Error("Refresh token not found in local storage.");
+    }
     const response = await fetch("https://accounts.spotify.com/api/token", {
         method: "POST",
         headers: {

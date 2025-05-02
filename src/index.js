@@ -1,6 +1,6 @@
 import request from "request";
 import dotenv from "dotenv";
-import { get_access_token, refresh_token } from "./spotifyAuth.js";
+import { get_access_token } from "./spotifyAuth.js";
 import ora from "ora";
 dotenv.config();
 
@@ -9,11 +9,7 @@ const PLAYLIST_IDs = process.argv.slice(2);
 
 (async () => {
     try {
-        console.log(
-            "Token: \x1b[33m" + (await get_access_token()) + "\x1b[0m\n"
-        );
-
-        //Test playlist
+        //If there are no arguments, use the test playlist
         if (PLAYLIST_IDs.length === 0) {
             console.log("\x1b[33mTest playlist\x1b[0m");
             PLAYLIST_IDs.push(process.env.TEST_PLAYLIST_ID);
