@@ -1,23 +1,29 @@
 import open from "open";
 import express from "express";
 import dotenv from "dotenv";
-import { LocalStorage } from "node-localstorage";
+import Conf from "conf";
 import querystring from "querystring";
+import e from "express";
 
 // Setup
 let app = express();
 app.listen(3000, () => {});
-dotenv.config({ path: "./.env" });
-const localStorage = new LocalStorage("./localStorage");
 
-// ENV variables
+dotenv.config({ path: "./.env" });
 const CLIENT_ID = process.env.CLIENT_ID;
 const REDIRECT_URI = process.env.REDIRECT_URI;
+
+const authStorage = new Conf({
+    configName: "auth",
+    projectName: "spotify-playlist-organizer",
+    projectVersion: "1.0.0",
+    encryptionKey: process.env.ENCRYPTION_KEY,
+});
 
 (async () => {
     // Check if CLIENT_ID and REDIRECT_URI are set
     if (!CLIENT_ID || !REDIRECT_URI) {
-        console.error(
+        throw new Error(
             "Please set CLIENT_ID and REDIRECT_URI in your .env file."
         );
         return;
@@ -38,16 +44,15 @@ const REDIRECT_URI = process.env.REDIRECT_URI;
             redirect_uri: REDIRECT_URI,
             state: state,
         });
-    await open(authURL);
+    await open(authURL, { wait: true });
 })();
 
 app.get("/callback", async (req, res) => {
     const code = req.query.code || null;
     const error = req.query.error || null;
-    const state = req.query.state || null;
 
     if (error) {
-        console.error("Error during authentication:", error);
+        throw new Error("Error during authentication:", error);
         res.status(500).send("Authentication failed. Please try again.");
         return;
     }
@@ -75,14 +80,15 @@ app.get("/callback", async (req, res) => {
 
     const tokenData = await tokenResponse.json();
     if (tokenData.error) {
-        console.error("Error getting access token:", tokenData.error);
+        throw new Error("Error getting access token:", tokenData.error);
         res.status(500).send("Error getting access token. Please try again.");
         return;
     }
 
     // Store the access token and refresh token in local storage
-    //localStorage.setItem("access_token", tokenData.access_token);
-    //localStorage.setItem("refresh_token", tokenData.refresh_token);
+    authStorage.set("access_token", tokenData.access_token);
+    authStorage.set("refresh_token", tokenData.refresh_token);
+    authStorage.set("expires_in", Date.now() + tokenData.expires_in * 1000);
 
     res.send("Authentication successful! You can close this tab.");
 });

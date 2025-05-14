@@ -135,5 +135,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# localStorage
-localStorage/
+# config files
+.config/

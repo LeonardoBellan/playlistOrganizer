@@ -5,16 +5,17 @@
     "main": "src/index.js",
     "scripts": {
         "spotools init": "node src/init.js",
-        "spotools start": "node src/index.js",
+        "start": "node src/index.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Bellan Leonardo",
     "license": "ISC",
     "type": "module",
     "dependencies": {
+        "commander": "^13.1.0",
+        "conf": "^13.1.0",
         "dotenv": "^16.4.7",
         "express": "^5.1.0",
-        "node-localstorage": "^3.0.5",
         "open": "^10.1.1",
         "ora": "^8.2.0",
         "request": "^2.88.2"
