@@ -1,11 +1,15 @@
 {
-    "name": "spotify",
+    "name": "spotools",
     "version": "1.0.0",
     "description": "Riorganizzatore di playlist",
-    "main": "src/index.js",
+    "main": "./src/index.js",
+    "bin": {
+        "mwc": "./bin/commander.js calculate",
+        "spotools": "index.js"
+    },
     "scripts": {
-        "spotools init": "node src/init.js",
-        "start": "node src/index.js",
+        "inits": "node src/init.js",
+        "spotools": "node src/index.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Bellan Leonardo",
