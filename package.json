@@ -1,17 +1,27 @@
 {
-    "name": "spotify",
+    "name": "spotools",
     "version": "1.0.0",
     "description": "Riorganizzatore di playlist",
-    "main": "src/index.js",
+    "main": "./src/index.js",
+    "bin": {
+        "mwc": "./bin/commander.js calculate",
+        "spotools": "index.js"
+    },
     "scripts": {
+        "inits": "node src/init.js",
+        "spotools": "node src/index.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Bellan Leonardo",
     "license": "ISC",
     "type": "module",
     "dependencies": {
+        "@clack/prompts": "^0.11.0",
+        "commander": "^13.1.0",
+        "conf": "^13.1.0",
         "dotenv": "^16.4.7",
-        "node-localstorage": "^3.0.5",
+        "express": "^5.1.0",
+        "open": "^10.1.1",
         "ora": "^8.2.0",
         "request": "^2.88.2"
     }
