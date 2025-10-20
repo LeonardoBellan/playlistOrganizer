@@ -1,31 +1,22 @@
-import ora from "ora";
 import { get_playlist_name, get_playlist_tracks, move_track } from "./API.js";
+import { tasks, spinner } from "@clack/prompts";
 
 export async function sortPlaylists(PLAYLIST_IDs) {
-    try {
-        console.log(PLAYLIST_IDs);
-        //Organize all playlists
-        let time = Date.now();
-        for (const playlist_id of PLAYLIST_IDs) {
-            //Move the tracks in the correct position
-            await sortTracks(playlist_id);
-        }
-
-        time = ((Date.now() - time) / 1000).toPrecision(3);
-        console.log(`\x1b[32m Playlists organized in ${time}s\x1b[0m`);
-    } catch (error) {
-        console.error("Error organizing playlists: ", error);
-    }
+    await tasks(
+        await PLAYLIST_IDs.map((playlist_id) => {
+            return {
+                title: "Organizing " + playlist_id,
+                task: async function () {
+                    await sortTracks(playlist_id);
+                    return "Organized " + playlist_id;
+                },
+            };
+        })
+    );
 }
 
-async function sortTracks(playlist_id) {
-    let playlist_name = await get_playlist_name(playlist_id);
+export async function sortTracks(playlist_id) {
     let tracks = await get_playlist_tracks(playlist_id);
-
-    //Loading animation
-    const loading = ora(
-        `\x1b[34mOrganizing ${playlist_name} :\x1b[0m ${tracks.length} tracks`
-    ).start();
 
     //Search for unsorted items
     for (let i = 0; i + 1 < tracks.length; i++) {
@@ -42,10 +33,6 @@ async function sortTracks(playlist_id) {
             }
         }
     }
-    loading.stopAndPersist({
-        symbol: "\x1b[32m✔\x1b[0m",
-        text: `\x1b[34mOrganized ${playlist_name}:\x1b[0m ${tracks.length} tracks`,
-    });
 }
 
 //Compares two tracks by their artist name, album and track number
@@ -83,3 +70,20 @@ async function shufflePlaylist(playlist_id) {
         text: `Shuffled in ${time}s`,
     });
 }
+
+/*export async function sortPlaylists(PLAYLIST_IDs) {
+    try {
+        console.log(PLAYLIST_IDs);
+        //Organize all playlists
+        let time = Date.now();
+        for (const playlist_id of PLAYLIST_IDs) {
+            //Move the tracks in the correct position
+            await sortTracks(playlist_id);
+        }
+
+        time = ((Date.now() - time) / 1000).toPrecision(3);
+        console.log(`\x1b[32m Playlists organized in ${time}s\x1b[0m`);
+    } catch (error) {
+        console.error("Error organizing playlists: ", error);
+    }
+}*/
