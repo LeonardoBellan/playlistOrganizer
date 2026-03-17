@@ -1,14 +1,15 @@
 import { get_playlist_name, get_playlist_tracks, move_track } from "./API.js";
-import { tasks, spinner } from "@clack/prompts";
+import { tasks, spinner, log } from "@clack/prompts";
 
-export async function sortPlaylists(PLAYLIST_IDs) {
+export async function sortPlaylists() {
+    const PLAYLIST_IDs = process.argv.slice(2);
     await tasks(
         await PLAYLIST_IDs.map((playlist_id) => {
             return {
                 title: "Organizing " + playlist_id,
                 task: async function () {
                     await sortTracks(playlist_id);
-                    return "Organized " + playlist_id;
+                    log.success("Organized");
                 },
             };
         })

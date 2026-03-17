@@ -8,7 +8,7 @@
     },
     "scripts": {
         "init": "node src/init.js",
-        "spotools": "node src/index.js",
+        "sort-playlist": "node scripts/sort-playlist.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Bellan Leonardo",
