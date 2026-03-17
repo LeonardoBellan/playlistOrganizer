@@ -1,30 +1,34 @@
 #!/usr/bin/env node
 
 import dotenv from "dotenv";
-import { sortPlaylists } from "./sortPlaylist.js";
-import { intro, outro } from "@clack/prompts";
-
+import { intro, outro, select } from "@clack/prompts";
+import { sortPlaylists } from "./sortPlaylists.js";
 //Setup
 dotenv.config();
 
 intro("Inizio app");
-//Playlists IDs
-const PLAYLIST_IDs = process.argv.slice(2);
 
-await sortPlaylists(PLAYLIST_IDs);
+/*Opzioni app
+Inizializzazione
+Organizzare le playlist
+Selezionare le playlist da organizzare
+*/
+
+const action = await select({
+    message: "Cosa vuoi fare?",
+    options: [
+        {
+            value: "sort",
+            label: "Sort my playlists!",
+        },
+        {
+            value: "select",
+            label: "Select playlists to sort",
+        },
+    ],
+});
+
+//Playlists IDs
+await sortPlaylists();
 
 outro("Fine app");
-
-/*(async () => {
-    //If there are no arguments, use the test playlist
-    if (PLAYLIST_IDs.length === 0) {
-        console.log("\x1b[33mTest playlist\x1b[0m");
-        PLAYLIST_IDs.push(process.env.TEST_PLAYLIST_ID);
-
-        //Shuffle the playlist randomly
-        //await shufflePlaylist(PLAYLIST_IDs[0]);
-    }
-
-    await sortPlaylists(PLAYLIST_IDs);
-})();
-*/

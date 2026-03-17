@@ -3,7 +3,6 @@ import express from "express";
 import dotenv from "dotenv";
 import Conf from "conf";
 import querystring from "querystring";
-import e from "express";
 
 // Setup
 let app = express();
